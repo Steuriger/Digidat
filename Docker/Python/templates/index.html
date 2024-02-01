@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta http-equiv="refresh" content="30">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dynamische Datenanzeige</title>
+</head>
+
+<body>
+    <div class="countdown-container">
+        <div id="countdown-container" class="w3-container">
+            <h1>Dynamische Datenanzeige</h1>
+            <p id="countdown">30s</p>
+    
+    
+
+
+    <div id="offline-container" class="w3-container">
+        <h2>Offline Sensors</h2>
+        <table class="w3-table-all">
+            <thead>
+                <tr class="w3-red">
+                    <th style="width: 80px;">Sensor Name</th>
+                    <th style="width: 150px;">Letzte Daten</th>
+                    <th style="width: 120px;">Raum</th>
+                    <th style="width: 80px;">Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in data %}
+                {% if item.status == 'offline' %}
+                <tr>
+                    <td>{{ item.sensor_name }}</td>
+                    <td>{{ item.time_difference }}</td>
+                    <td>{{ item.room }}</td>
+                    <td>{{ item.status }}</td>
+                </tr>
+                {% endif %}
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div id="online-container" class="w3-container">
+        <h2>Online Sensors</h2>
+        <table class="w3-table-all">
+            <thead>
+                <tr class="w3-green">
+                    <th style="width: 80px;">Sensor Name</th>
+                    <th style="width: 150px;">Letzte Daten</th>
+                    <th style="width: 120px;">Raum</th>
+                    <th style="width: 80px;">Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in online_data %}
+                <tr>
+                    <td>{{ item.sensor_name }}</td>
+                    <td>{{ item.time_difference }}</td>
+                    <td>{{ item.room }}</td>
+                    <td>{{ item.status }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+
+
+    <script>
+        // Setze die Startzeit für den Countdown
+        let timeRemaining = 30;
+
+        // Aktualisiere den Countdown alle 1 Sekunde
+        const countdown = setInterval(function () {
+            // Aktualisiere das HTML-Element mit dem Countdown
+            document.getElementById("countdown").innerHTML = `${timeRemaining}s`;
+
+            // Reduziere die verbleibende Zeit um 1 Sekunde
+            timeRemaining--;
+
+            // Überprüfe, ob der Countdown abgelaufen ist
+            if (timeRemaining < 0) {
+                clearInterval(countdown); // Stoppe den Countdown, wenn abgelaufen
+                document.getElementById("countdown").innerHTML = "Countdown abgelaufen!";
+            }
+        }, 1000); // Aktualisiere alle 1000 Millisekunden (1 Sekunde)
+    </script>
+
+</body>
+
+</html>
