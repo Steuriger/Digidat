@@ -126,7 +126,7 @@ def index():
 
     
 def start_flask_app():
-    app.run(debug=True, extra_files=['templates/index.html'])
+    app.run(host='0.0.0.0', debug=True, extra_files=['templates/index.html'])
 
 if __name__ == '__main__':
     schedule.every(60).seconds.do(get_last_update_time)
