@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+  <title>OpenSenseMap Daten für AGIN Gruppe</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-image: url('https://www.agibk.at/files/microsoft_word_-_raumplan_2023_24_mit_container.docx.jpg');
+      background-size: contain;
+      background-repeat: no-repeat;
+      position: relative;
+      z-index: 0;
+      height: 200vh;
+    }
+
+    #map-container {
+      position: relative;
+      width: 100%;
+    }
+
+    .sensor-point-online {
+      position: absolute;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      cursor: pointer;
+      background-color: green;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: white;
+      font-weight: bold;
+      font-size: 12px;
+    }
+
+    .sensor-point-offline {
+      position: absolute;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      cursor: pointer;
+      background-color: red;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: white;
+      font-weight: bold;
+      font-size: 12px;
+    }
+    .sensor-details-online {
+      position: absolute;
+      width: 200px;
+      border-radius: 20px;
+      background-color: green;
+      border: 1px solid #ccc;
+      padding: 10px;
+      display: none;
+      z-index: 1;
+      top: 0%;
+      left: 0px;
+      transition: opacity 0.5s ease;
+      opacity: 0;
+    }
+    .sensor-details-offline {
+      position: absolute;
+      width: 200px;
+      border-radius: 20px;
+      background-color: red;
+      border: 1px solid #ccc;
+      padding: 10px;
+      display: none;
+      z-index: 1;
+      top: 0%;
+      left: 0px;
+      transition: opacity 0.5s ease;
+      opacity: 0;
+    }
+    .sensor-point-online:hover .sensor-details-online {
+      display: block;
+      opacity: 1;
+    }
+    .sensor-point-offline:hover .sensor-details-offline {
+      display: block;
+      opacity: 1;
+    }
+
+    
+    #detailed-info {
+      background-color: white;
+      padding: 20px;
+      margin-top: 20px;
+    }
+
+    #sensor-data {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    #sensor-data th, #sensor-data td {
+      border: 1px solid #ddd;
+      padding: 8px;
+      text-align: left;
+    }
+
+    #sensor-data th {
+      background-color: #f2f2f2; 
+    }
+
+ 
+
+    .hidden {
+      display: none;
+    }
+
+    .sensor-point-offline#sensor-point-1 { top: 21.7%; left: 54%; }
+    .sensor-point-offline#sensor-point-2 { top: 18.5%; left: 54%; }
+    .sensor-point-offline#sensor-point-3 { top: 23%; left: 70%; }
+    .sensor-point-offline#sensor-point-4 { top: 26%; left: 68.5%; }
+    .sensor-point-offline#sensor-point-5 { top: 26%; left: 71%; }
+    .sensor-point-offline#sensor-point-6 { top: 77%; left: 27.3%; }
+    .sensor-point-offline#sensor-point-7 { top: 77%; left: 24.5%; }
+    .sensor-point-offline#sensor-point-8 { top: 74%; left: 25.7%; }
+    .sensor-point-offline#sensor-point-9 { top: 58.5%; left: 62.5%; }
+    .sensor-point-offline#sensor-point-10 { top: 5.2%; left: 5.2%; }
+    .sensor-point-offline#sensor-point-11 { top: 16.5%; left: 52.3%; }
+    .sensor-point-offline#sensor-point-12 { top: 22%; left: 68%; }
+    .sensor-point-offline#sensor-point-13 { top: 56%; left: 64.5%; }
+    .sensor-point-offline#sensor-point-14 { top: 54%; left: 62.5%; } 
+    .sensor-point-offline#sensor-point-15 { top: 80%; left: 56.4%; }
+    
+    
+    .sensor-point-online#sensor-point-1 { top: 21.7%; left: 54%; }
+    .sensor-point-online#sensor-point-2 { top: 18.5%; left: 54%; }
+    .sensor-point-online#sensor-point-3 { top: 23%; left: 70%; }
+    .sensor-point-online#sensor-point-4 { top: 26%; left: 68.5%; }
+    .sensor-point-online#sensor-point-5 { top: 26%; left: 71%; }
+    .sensor-point-online#sensor-point-6 { top: 77%; left: 27.3%; }
+    .sensor-point-online#sensor-point-7 { top: 77%; left: 24.5%; }
+    .sensor-point-online#sensor-point-8 { top: 74%; left: 25.7%; }
+    .sensor-point-online#sensor-point-9 { top: 58.5%; left: 62.5%; }
+    .sensor-point-online#sensor-point-10 { top: 5.2%; left: 5.2%; }
+    .sensor-point-online#sensor-point-11 { top: 16.5%; left: 52.3%; }
+    .sensor-point-online#sensor-point-12 { top: 22%; left: 68%; }
+    .sensor-point-online#sensor-point-13 { top: 56%; left: 64.5%; }
+    .sensor-point-online#sensor-point-14 { top: 54%; left: 62.5%; } 
+    .sensor-point-online#sensor-point-15 { top: 80%; left: 56.4%; }
+    
+    img {
+        max-width: 100%;
+        height: auto;
+    }
+  </style>
+</head>
+<body>
+  <div class="w3-sidebar w3-bar-block w3-border-right" style="display:none" id="mySidebar">
+    <button onclick="w3_close()" class="w3-bar-item w3-large">Close &times;</button>
+    <a href="main.html" class="w3-bar-item w3-button">Main</a>
+    <a href="map.html" class="w3-bar-item w3-button">Map</a>
+    <a href="statistics.html" class="w3-bar-item w3-button">Statistik</a>
+  </div>
+
+<div class="w3-teal">
+    <button class="w3-button w3-teal w3-xlarge" onclick="w3_open()">☰</button>
+  </div>
+
+  <div id="map-container" style="position: relative;">
+    <img src="https://www.agibk.at/files/microsoft_word_-_raumplan_2023_24_mit_container.docx.jpg" alt="Raumplan" style="width: 100%; height: auto;">
+    <div class="sensor-point" id="sensor-point-1">1</div>
+    <div class="sensor-point" id="sensor-point-2">2</div>
+    <div class="sensor-point" id="sensor-point-3">3</div>
+    <div class="sensor-point" id="sensor-point-4">4</div>
+    <div class="sensor-point" id="sensor-point-5">5</div>
+    <div class="sensor-point" id="sensor-point-6">6</div>
+    <div class="sensor-point" id="sensor-point-7">7</div>
+    <div class="sensor-point" id="sensor-point-8">8</div>
+    <div class="sensor-point" id="sensor-point-9">9</div>
+    <div class="sensor-point" id="sensor-point-10">10</div>
+    <div class="sensor-point" id="sensor-point-11">11</div>
+    <div class="sensor-point" id="sensor-point-12">12</div>
+    <div class="sensor-point" id="sensor-point-13">13</div>
+    <div class="sensor-point" id="sensor-point-14">14</div>
+    <div class="sensor-point" id="sensor-point-15">15</div>
+  </div>
+
+  <div id="detailed-info" style="display: none;">
+    <h2 id="box-name"></h2>
+    <table id="sensor-data">
+      <thead>
+        <tr>
+          <th>Sensor</th>
+          <th>Wert</th>
+        </tr>
+      </thead>
+      <tbody>
+        <div id="daten" class="hidden">
+          <!-- Hier kommen die Sensordaten hin -->
+        </div>
+      </tbody>
+    </table>
+  </div>
+
+  <script>
+    let currentBox;
+    let selectedBoxes = [];
+    let data = [];
+    let memoryBox;
+    let selectedMenuItem = 0;
+    let scrolling;
+
+    function isBoxOffline(lastUpdate) {
+    const now = new Date();
+    const difference = now - lastUpdate;
+    const minutes = Math.floor(difference / (1000 * 60)); // Umrechnung von Millisekunden in Minuten  
+    return minutes > 6; // Rückgabe true, wenn mehr als 6 Minuten vergangen sind, sonst false
+}
+function w3_open() {
+  document.getElementById("mySidebar").style.display = "block";
+}
+
+function w3_close() {
+  document.getElementById("mySidebar").style.display = "none";
+}
+
+function checkOfflineTime(data) {
+    data.forEach((box, index) => {
+        const boxPointId = `sensor-point-${index + 1}`;
+        const boxPoint = document.getElementById(boxPointId);
+
+        if (!boxPoint) {
+            console.error("Box-Punkt nicht gefunden für ID:", index + 1);
+            return;
+        }
+
+        const lastUpdateRaw = new Date(box.updatedAt);
+
+        if (!isNaN(lastUpdateRaw.getTime())) {
+            
+            
+            if (isBoxOffline(lastUpdateRaw)) {
+              
+              boxPoint.classList.remove("online");
+              boxPoint.classList.add('offline');
+              boxPoint.classList.remove("sensor-point-online");
+              boxPoint.classList.add("sensor-point-offline");
+            } else {
+              boxPoint.classList.remove('offline');
+              boxPoint.classList.add("online");
+              boxPoint.classList.remove("sensor-point-offline");
+              boxPoint.classList.add("sensor-point-online");
+            }
+
+        } else {
+            console.error("Ungültiges Datum:", box.updatedAt);
+        }
+    });
+}
+
+
+
+
+
+
+
+    function displayComparisonTable(selectedBoxes) {
+      const tableBody = document.getElementById('compare-table').querySelector('tbody');
+      tableBody.innerHTML = '';
+      selectedBoxes.forEach(boxName => {
+        const box = data.find(box => box.name === boxName);
+        if (box) {
+          box.sensors.forEach(sensor => {
+            const row = document.createElement('tr');
+            row.innerHTML = `<td>${sensor.title}</td><td>${sensor.lastMeasurement ? sensor.lastMeasurement.value : '---'}</td>`;
+            tableBody.appendChild(row);
+          });
+        }
+      });
+
+      document.querySelector('.compare-table-container').style.display = selectedBoxes.length > 0 ? 'block' : 'none';
+    }
+
+
+
+  function fetchData() {
+     
+    
+    
+  const xhr = new XMLHttpRequest();
+  const url = 'https://api.opensensemap.org/boxes?grouptag=AGIN&full=true';
+  xhr.onreadystatechange = function() {
+    if (xhr.readyState === XMLHttpRequest.DONE) {
+      if (xhr.status === 200) {
+        data = JSON.parse(xhr.responseText);
+        displayData(data); // Hier wird die Funktion aufgerufen, nachdem die Daten erfolgreich abgerufen wurden
+      } else {
+        console.error('Fehler beim Abrufen der Daten:', xhr.status, xhr.statusText);
+    
+      }
+    }
+  };
+
+  xhr.onerror = function() {
+    console.error('Ein Fehler ist aufgetreten:');
+    
+  };
+
+  xhr.open('GET', url);
+  xhr.send();
+}
+
+
+
+
+function displayData(data) {
+  const mapContainer = document.getElementById('map-container');
+  const sensorDataContainer = document.getElementById('sensor-data').querySelector('tbody');
+  sensorDataContainer.innerHTML = '';
+  let clicked = false; // Setze clicked auf false
+  
+
+  data.forEach((box, index) => {
+    const point = document.createElement('div');
+    const lastUpdateRaw = new Date(box.updatedAt);
+    const details = document.createElement('div');
+    if (!isNaN(lastUpdateRaw.getTime())) {
+
+
+      if (isBoxOffline(lastUpdateRaw)) {
+        point.classList.add('sensor-point-offline');
+        details.classList.add('sensor-details-offline');
+      } else {
+        point.classList.add('sensor-point-online');
+        details.classList.add('sensor-details-online');
+      }
+    }
+    point.id = `sensor-point-${index + 1}`;
+    point.textContent = index + 1;
+    point.style.left = '';
+    point.style.top = '';
+    point.addEventListener('click', () => {
+      clicked = true;
+      memoryBox = box;
+      scrolling = true;
+      currentBox = `DIGIdat_AGIN_${index + 1}`;
+      showDetailedInfo(box);
+       
+    });
+
+    // Überprüfen, ob memoryBox gesetzt ist, und Details anzeigen, wenn nicht geklickt wurde
+    if (!clicked && memoryBox) {
+      scrolling = false;
+      showDetailedInfo(memoryBox);
+
+    }
+
+    details.innerHTML = `
+      <p>DIGIdat_AGIN_${index + 1}<p>
+      <p>Raum: ${getRoomName(box)}</p>
+      <p>Letztes Update: ${getTimeSinceLastUpdate(new Date(box.updatedAt))}</p>
+      <p>Temperatur: ${getSensorValue(box, 'Temperatur')} °C</p>
+      <p>CO2-Wert: ${getSensorValue(box, 'CO₂')} ppm</p>
+    `;
+    point.appendChild(details);
+    mapContainer.appendChild(point);
+  });
+
+  checkOfflineTime(data); // Hier wird die Funktion aufgerufen, nachdem die Sensorpunkte erstellt wurden
+}
+
+
+
+    function showDetailedInfo(box) {
+      document.getElementById('box-name').textContent = currentBox;
+      const tableBody = document.getElementById('sensor-data').querySelector('tbody');
+      tableBody.innerHTML = '';
+
+      const roomRow = document.createElement('tr');
+      roomRow.innerHTML = `<td>Raum</td><td>${getRoomName(box)}</td>`;
+      tableBody.appendChild(roomRow);
+
+      const lastUpdateRow = document.createElement('tr');
+      lastUpdateRow.innerHTML = `<td>Zuletzt aktualisiert</td><td>${getTimeSinceLastUpdate(new Date(box.updatedAt))}</td>`;
+      tableBody.appendChild(lastUpdateRow);
+
+      box.sensors.forEach(sensor => {
+        const row = document.createElement('tr');
+        row.innerHTML = `<td>${sensor.title}</td><td>${sensor.lastMeasurement ? sensor.lastMeasurement.value : '---'}</td>`;
+        tableBody.appendChild(row);
+      });
+
+      document.getElementById('detailed-info').style.display = 'block';
+      // Automatisch nach unten scrollen, um die Details sichtbar zu machen
+      if (scrolling === true){
+        document.getElementById('detailed-info').scrollIntoView({ behavior: 'smooth' });
+      } 
+      
+    }
+
+    function getTimeSinceLastUpdate(lastUpdate) {
+      const now = new Date();
+      const difference = now - lastUpdate;
+      const seconds = Math.floor(difference / 1000);
+      if (seconds < 60) {
+        return `${seconds} Sekunden`;
+      }
+      const minutes = Math.floor(seconds / 60);
+      if (minutes < 60) {
+        if (minutes <= 5)
+          return `${minutes} Minuten`;
+      }
+      const hours = Math.floor(minutes / 60);
+      if (hours < 24) {
+        return `${hours} Stunden`;
+      }
+      const days = Math.floor(hours / 24);
+      return `${days} Tage`;
+    }
+
+    function getRoomName(box) {
+      const roomId = box._id;
+      const roomMapping = {
+        "6384f0d80848bc001bfe60c4": "4c 2. Stock",
+        "6384f2aa0848bc001bff4c35": "4c 2. Stock",
+        "6384f2ab0848bc001bff4c6d": "3c 2. Stock",
+        "6384f2ab0848bc001bff4c8e": "3c 2. Stock",
+        "6384f2ab0848bc001bff4cad": "3c 2. Stock",
+        "6384f2ac0848bc001bff4cf9": "2c 1. Stock",
+        "6384f2ac0848bc001bff4d30": "2c 1. Stock",
+        "6384f2b40848bc001bff5090": "2c 1. Stock",
+        "6384f2be0848bc001bff5614": "5b 3. Stock",
+        "6384f2c80848bc001bff5b15": "Werk2 Untergeschoss",
+        "6384f2d20848bc001bff5f82": "4c 2. Stock",
+        "6384f2dc0848bc001bff6649": "Gang 2. Stock",
+        "6384f2e60848bc001bff6c16": "5b 3. Stock",
+        "6384f2f00848bc001bff73c0": "5b 3. Stock",
+        "6384f2fa0848bc001bff76c6": "Balkon"
+      };
+      return roomMapping[roomId] || 'Unbekannter Raum';
+    }
+
+    function getSensorValue(box, type) {
+      const sensor = box.sensors.find(sensor => sensor.title === type);
+      return sensor ? sensor.lastMeasurement.value : '---';
+    }
+
+    // Initialisierung
+    window.onload = function() {
+      fetchData();
+      setInterval(fetchData, 10000);
+    }
+  </script>
+</body>
+</html>
