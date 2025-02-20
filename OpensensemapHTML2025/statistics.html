@@ -49,7 +49,7 @@
   <canvas id="lineChart_13" width="800" height="400"></canvas>
 
 <script>
-  let colors = [
+let colors = [
           'rgba(255, 99, 132, 1)',    // Rot
           'rgba(54, 162, 235, 1)',    // Blau
           'rgba(255, 206, 86, 1)',    // Gelb
@@ -65,17 +65,17 @@
           'rgba(128, 0, 0, 1)',       // Dunkelrot
           'rgba(0, 0, 128, 1)',       // Dunkelblau
           'rgba(0, 0, 0, 1)'          // Schwarz
-        ];
+];
         
-  function w3_open() {
+function w3_open() {
     document.getElementById("mySidebar").style.display = "block";
-  }
+}
 
-  function w3_close() {
+function w3_close() {
     document.getElementById("mySidebar").style.display = "none";
-  }
+}
 
-  async function setupCharts() {
+async function setupCharts() {
     const response = await fetch('https://api.opensensemap.org/boxes?grouptag=AGIN&full=true');
     const data = await response.json();
   
@@ -91,11 +91,11 @@
       const { lineChartData, lineChart, boxData } = createChart(i, sensorType);
       setInterval(() => updateChart(lineChartData, lineChart, boxData, i), 5 * 60 * 1000);
     }
-  }
+}
 
-  setupCharts();
+setupCharts();
 
-  function createChart(sensorIndex, sensorType) {
+function createChart(sensorIndex, sensorType) {
     const lineChartData = {
       labels: [],
       datasets: []
@@ -133,7 +133,7 @@
     });
 
     return { lineChartData, lineChart, boxData };
-  }
+}
 
   async function updateChart(lineChartData, lineChart, boxData, sensorIndex) {
   const response = await fetch('https://api.opensensemap.org/boxes?grouptag=AGIN&full=true');
@@ -148,17 +148,17 @@
     }
   });
 
-  lineChartData.labels.push(currentTime.format('HH:mm:ss'));
+lineChartData.labels.push(currentTime.format('HH:mm:ss'));
 
-  const oneHourAgo = currentTime.clone().subtract(1, 'hour');
-  while (moment(lineChartData.labels[0], 'HH:mm:ss').isBefore(oneHourAgo)) {
+const oneHourAgo = currentTime.clone().subtract(1, 'hour');
+while (moment(lineChartData.labels[0], 'HH:mm:ss').isBefore(oneHourAgo)) {
     lineChartData.labels.shift();
     boxData.forEach(box => {
       box.data.shift();
-    });
-  }
+  });
+}
 
-  boxData.forEach((box, index) => {
+boxData.forEach((box, index) => {
     if (lineChartData.datasets.length <= index) {
       lineChartData.datasets.push({
         label: box.label,
@@ -168,15 +168,10 @@
       });
     }
     lineChartData.datasets[index].data = box.data;
-  });
-  
+  });  
   lineChart.update();
 }
-
-
-
-
-  document.getElementById('chartSelector').addEventListener('change', function() {
+document.getElementById('chartSelector').addEventListener('change', function() {
     const selectedChartId = this.value;
     const selectedChart = document.getElementById(selectedChartId);
     const allCharts = document.querySelectorAll('canvas');
