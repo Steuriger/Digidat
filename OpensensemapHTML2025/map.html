@@ -204,15 +204,15 @@
     </table>
   </div>
 
-  <script>
-    let currentBox;
-    let selectedBoxes = [];
-    let data = [];
-    let memoryBox;
-    let selectedMenuItem = 0;
-    let scrolling;
+<script>
+let currentBox;
+let selectedBoxes = [];
+let data = [];
+let memoryBox;
+let selectedMenuItem = 0;
+let scrolling;
 
-    function isBoxOffline(lastUpdate) {
+function isBoxOffline(lastUpdate) {
     const now = new Date();
     const difference = now - lastUpdate;
     const minutes = Math.floor(difference / (1000 * 60)); // Umrechnung von Millisekunden in Minuten  
@@ -260,13 +260,7 @@ function checkOfflineTime(data) {
     });
 }
 
-
-
-
-
-
-
-    function displayComparisonTable(selectedBoxes) {
+function displayComparisonTable(selectedBoxes) {
       const tableBody = document.getElementById('compare-table').querySelector('tbody');
       tableBody.innerHTML = '';
       selectedBoxes.forEach(boxName => {
@@ -281,14 +275,11 @@ function checkOfflineTime(data) {
       });
 
       document.querySelector('.compare-table-container').style.display = selectedBoxes.length > 0 ? 'block' : 'none';
-    }
+}
 
 
 
-  function fetchData() {
-     
-    
-    
+function fetchData() {    
   const xhr = new XMLHttpRequest();
   const url = 'https://api.opensensemap.org/boxes?grouptag=AGIN&full=true';
   xhr.onreadystatechange = function() {
@@ -304,10 +295,8 @@ function checkOfflineTime(data) {
   };
 
   xhr.onerror = function() {
-    console.error('Ein Fehler ist aufgetreten:');
-    
+  console.error('Ein Fehler ist aufgetreten:');
   };
-
   xhr.open('GET', url);
   xhr.send();
 }
@@ -373,7 +362,7 @@ function displayData(data) {
 
 
 
-    function showDetailedInfo(box) {
+function showDetailedInfo(box) {
       document.getElementById('box-name').textContent = currentBox;
       const tableBody = document.getElementById('sensor-data').querySelector('tbody');
       tableBody.innerHTML = '';
@@ -396,11 +385,10 @@ function displayData(data) {
       // Automatisch nach unten scrollen, um die Details sichtbar zu machen
       if (scrolling === true){
         document.getElementById('detailed-info').scrollIntoView({ behavior: 'smooth' });
-      } 
-      
-    }
+      }       
+}
 
-    function getTimeSinceLastUpdate(lastUpdate) {
+function getTimeSinceLastUpdate(lastUpdate) {
       const now = new Date();
       const difference = now - lastUpdate;
       const seconds = Math.floor(difference / 1000);
@@ -418,9 +406,9 @@ function displayData(data) {
       }
       const days = Math.floor(hours / 24);
       return `${days} Tage`;
-    }
+}
 
-    function getRoomName(box) {
+function getRoomName(box) {
       const roomId = box._id;
       const roomMapping = {
         "6384f0d80848bc001bfe60c4": "2e 2. Stock",
@@ -440,12 +428,12 @@ function displayData(data) {
         "6384f2fa0848bc001bff76c6": "Balkon"
       };
       return roomMapping[roomId] || 'Unbekannter Raum';
-    }
+}
 
-    function getSensorValue(box, type) {
+function getSensorValue(box, type) {
       const sensor = box.sensors.find(sensor => sensor.title === type);
       return sensor ? sensor.lastMeasurement.value : '---';
-    }
+}
 
     // Initialisierung
     window.onload = function() {
