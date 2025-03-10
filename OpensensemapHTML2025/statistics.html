@@ -89,6 +89,7 @@
     chartSelector.appendChild(option);
 
     const { lineChartData, lineChart, boxData } = createChart(i, sensorType);
+    updateChart(lineChartData, lineChart, boxData, i)
     setInterval(() => updateChart(lineChartData, lineChart, boxData, i), 5 * 60 * 1000);
   }
 
